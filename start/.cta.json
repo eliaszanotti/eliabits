@@ -2,7 +2,7 @@
     "projectName": "eliabits",
     "mode": "file-router",
     "typescript": true,
-    "tailwind": false,
+    "tailwind": true,
     "packageManager": "bun",
     "git": false,
     "install": true,
