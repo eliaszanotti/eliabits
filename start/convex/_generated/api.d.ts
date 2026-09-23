@@ -9,7 +9,10 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as domains_habit_categories_categories from "../domains/habit_categories/categories.js";
+import type * as domains_habits_lib_local_owner from "../domains/habits/lib/local_owner.js";
 import type * as domains_habits_mutations_create from "../domains/habits/mutations/create.js";
+import type * as domains_habits_mutations_set_category from "../domains/habits/mutations/set_category.js";
 import type * as domains_habits_mutations_toggle_completion from "../domains/habits/mutations/toggle_completion.js";
 import type * as domains_habits_queries_completions_for_date_range from "../domains/habits/queries/completions_for_date_range.js";
 import type * as domains_habits_queries_list from "../domains/habits/queries/list.js";
@@ -23,7 +26,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  "domains/habit_categories/categories": typeof domains_habit_categories_categories;
+  "domains/habits/lib/local_owner": typeof domains_habits_lib_local_owner;
   "domains/habits/mutations/create": typeof domains_habits_mutations_create;
+  "domains/habits/mutations/set_category": typeof domains_habits_mutations_set_category;
   "domains/habits/mutations/toggle_completion": typeof domains_habits_mutations_toggle_completion;
   "domains/habits/queries/completions_for_date_range": typeof domains_habits_queries_completions_for_date_range;
   "domains/habits/queries/list": typeof domains_habits_queries_list;

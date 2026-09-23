@@ -1,0 +1,18 @@
+import { LoaderCircle } from 'lucide-react'
+import type { ComponentProps } from 'react'
+
+import { cn } from 'cn'
+
+function Spinner({ className, ...props }: ComponentProps<typeof LoaderCircle>) {
+    return (
+        <LoaderCircle
+            data-slot="spinner"
+            role="status"
+            aria-label="Chargement"
+            className={cn('size-4 animate-spin', className)}
+            {...props}
+        />
+    )
+}
+
+export { Spinner }

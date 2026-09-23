@@ -1,17 +1,16 @@
 import { v } from 'convex/values'
-
 import { mutation } from '../../../_generated/server'
 import { LOCAL_OWNER_ID } from '../lib/local_owner'
 
-export const create = mutation({
-    args: { name: v.string(), categoryId: v.optional(v.id('habitCategories')) },
+export const setCategory = mutation({
+    args: { habitId: v.id('habits'), categoryId: v.optional(v.id('habitCategories')) },
     handler: async (ctx, args) => {
-        const name = args.name.trim()
-        if (!name) throw new Error('Le nom de l’habitude est requis.')
+        const habit = await ctx.db.get(args.habitId)
+        if (!habit || habit.ownerId !== LOCAL_OWNER_ID) throw new Error('Habitude introuvable.')
         if (args.categoryId) {
             const category = await ctx.db.get(args.categoryId)
             if (!category || category.ownerId !== LOCAL_OWNER_ID) throw new Error('Catégorie introuvable.')
         }
-        return ctx.db.insert('habits', { ownerId: LOCAL_OWNER_ID, name, categoryId: args.categoryId, createdAt: Date.now() })
+        await ctx.db.patch(args.habitId, { categoryId: args.categoryId })
     },
 })

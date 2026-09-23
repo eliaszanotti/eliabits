@@ -16,3 +16,19 @@ export function useToggleHabitCompletion() {
 export type ToggleHabitCompletionResult = FunctionReturnType<
     typeof api.domains.habits.mutations.toggle_completion.toggleCompletion
 >
+
+export function useCreateCategory() {
+    return useMutation({ mutationFn: useConvexMutation(api.domains.habit_categories.categories.create) })
+}
+
+export function useRenameCategory() {
+    return useMutation({ mutationFn: useConvexMutation(api.domains.habit_categories.categories.rename) })
+}
+
+export function useDeleteCategory() {
+    return useMutation({ mutationFn: useConvexMutation(api.domains.habit_categories.categories.remove) })
+}
+
+export function useSetHabitCategory() {
+    return useMutation({ mutationFn: useConvexMutation(api.domains.habits.mutations.set_category.setCategory) })
+}

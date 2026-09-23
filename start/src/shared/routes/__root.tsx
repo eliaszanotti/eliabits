@@ -16,7 +16,7 @@ export const Route = createRootRoute({
                 content: 'width=device-width, initial-scale=1',
             },
             {
-                title: 'TanStack Start Starter',
+                title: 'Eliabits — Mes habitudes',
             },
         ],
         links: [
@@ -31,7 +31,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: RootDocumentProps) {
     return (
-        <html lang="en">
+        <html lang="fr">
             <head>
                 <HeadContent />
             </head>
