@@ -12,11 +12,83 @@
 body {
     margin: 0;
     font-family: var(--font-sans);
+    background: #f4f6f3;
 }
 
 main {
-    width: min(42rem, calc(100% - 2rem));
-    margin: 4rem auto;
+    width: min(72rem, calc(100% - 3rem));
+    margin: 0 auto;
+}
+
+.tracker-shell { padding: 4.5rem 0 3rem; }
+.tracker-header { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 2.75rem; }
+.brand-mark { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border-radius: 11px; color: #f4f6f3; background: #1d3b36; }
+.eyebrow { margin: 0 0 0.25rem; color: #78908b; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.tracker-header h1 { margin: 0; color: #1c2d2a; font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -0.045em; }
+.week-nav { display: flex; align-items: center; gap: 0.35rem; margin-left: auto; color: #50645f; font-size: 0.85rem; font-weight: 650; }
+.week-nav button { display: grid; width: 2rem; height: 2rem; place-items: center; border: 1px solid #d6e0da; border-radius: 8px; color: #50645f; background: #fff; cursor: pointer; }
+.week-nav button:hover { background: #e8f0eb; }
+.today-summary { display: flex; align-items: end; justify-content: space-between; padding-bottom: 1.4rem; }
+.summary-text { margin: 0; color: #5d726c; font-size: 0.94rem; }
+.today-progress { display: flex; align-items: baseline; gap: 0.25rem; margin: 0; color: #78908b; }
+.today-progress strong { color: #1d3b36; font-size: 2.1rem; letter-spacing: -0.06em; }
+.today-progress span { font-size: 0.8rem; }
+.tracker-table-wrap { overflow-x: auto; border: 1px solid #d9e3dc; border-radius: 14px; background: #fff; box-shadow: 0 16px 38px rgb(43 67 59 / 7%); }
+.tracker-table { min-width: 680px; }
+.tracker-row { display: grid; grid-template-columns: minmax(210px, 1.7fr) repeat(7, minmax(64px, 1fr)); min-height: 4.55rem; border-top: 1px solid #e6ece7; }
+.tracker-head { min-height: 4.1rem; border-top: 0; background: #f8faf8; }
+.habit-cell, .day-cell { display: flex; align-items: center; }
+.habit-cell { padding: 0 1.35rem; color: #304640; font-size: 0.88rem; font-weight: 620; }
+.habit-heading { color: #78908b; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.day-cell { justify-content: center; border-left: 1px solid #edf1ee; }
+.tracker-head .day-cell { flex-direction: column; gap: 0.22rem; color: #859892; font-size: 0.68rem; line-height: 1; text-transform: capitalize; }
+.tracker-head .day-cell strong { color: #536b64; font-size: 0.75rem; font-weight: 650; }
+.tracker-head .day-cell.is-today { background: #edf5ef; }
+.tracker-head .day-cell.is-today strong, .tracker-head .day-cell.is-today span { color: #23735c; }
+.check-button { display: grid; width: 1.65rem; height: 1.65rem; place-items: center; border: 1.5px solid #cad8d0; border-radius: 7px; color: #fff; background: #fff; cursor: pointer; transition: background 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.check-button:hover { border-color: #70a58d; background: #f2f8f3; transform: scale(1.06); }
+.check-button:focus-visible, .week-nav button:focus-visible, .add-action button:focus-visible, .add-row input:focus-visible { outline: 3px solid rgb(68 139 107 / 30%); outline-offset: 2px; }
+.check-button.checked { border-color: #2d8568; background: #2d8568; }
+.add-row { min-height: 4.2rem; background: #fcfdfc; }
+.add-row input { width: 100%; border: 0; outline: 0; color: #304640; background: transparent; font: inherit; font-size: 0.85rem; }
+.add-row input::placeholder { color: #9aaba4; }
+.add-action { grid-column: 2 / -1; display: flex; align-items: center; justify-content: flex-end; padding-right: 1.15rem; }
+.add-action button { display: inline-flex; align-items: center; gap: 0.4rem; border: 0; color: #2d8568; background: transparent; font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+.add-action button:hover { color: #1d604b; }
+.tracker-hint { margin: 1.05rem 0 0; color: #8a9a94; font-size: 0.76rem; text-align: center; }
+
+@media (max-width: 600px) {
+    main { width: min(100% - 1.25rem, 72rem); }
+    .tracker-shell { padding-top: 2.25rem; }
+    .tracker-header { margin-bottom: 2rem; }
+    .week-nav span { display: none; }
+    .today-summary { align-items: center; }
+    .tracker-row { grid-template-columns: 185px repeat(7, 64px); }
+    .habit-cell { padding: 0 1rem; }
+}
+
+.day-toolbar { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 2rem; }
+.date-picker { position: relative; display: inline-flex; align-items: center; gap: 0.55rem; min-height: 2.25rem; padding: 0 0.75rem; border: 1px solid #d6e0da; border-radius: 0.5rem; color: #304640; background: #fff; font-size: 0.86rem; font-weight: 650; cursor: pointer; }
+.date-picker input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
+.day-summary { display: flex; align-items: end; justify-content: space-between; padding-bottom: 1.4rem; }
+.habit-list { overflow: hidden; border: 1px solid #d9e3dc; border-radius: 14px; background: #fff; box-shadow: 0 16px 38px rgb(43 67 59 / 7%); }
+.habit-list-heading, .habit-item { display: flex; align-items: center; justify-content: space-between; min-height: 4.25rem; padding: 0 1.35rem; }
+.habit-list-heading { min-height: 3rem; color: #78908b; background: #f8faf8; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.habit-item { color: #304640; font-size: 0.9rem; font-weight: 620; }
+.habit-item + .habit-item { border-top: 1px solid #edf1ee; }
+.habit-item [data-slot='button'] { border-color: #cad8d0; }
+.habit-item [data-slot='button']:not([aria-pressed='true']) { color: #cad8d0; }
+.habit-item [data-slot='button'][aria-pressed='true'] { border-color: #2d8568; background: #2d8568; }
+.habit-list > [data-slot='separator'] { margin: 0 1.35rem; width: auto; }
+.add-habit { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.1rem; }
+.add-habit [data-slot='input'] { border-color: transparent; box-shadow: none; }
+.add-habit [data-slot='button'] { color: #2d8568; }
+
+@media (max-width: 600px) {
+    .day-toolbar { margin-bottom: 1.5rem; }
+    .date-picker { max-width: calc(100vw - 8rem); }
+    .date-picker span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .habit-list-heading, .habit-item { padding: 0 1rem; }
 }
 
 @theme inline {

@@ -9,6 +9,10 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as domains_habits_mutations_create from "../domains/habits/mutations/create.js";
+import type * as domains_habits_mutations_toggle_completion from "../domains/habits/mutations/toggle_completion.js";
+import type * as domains_habits_queries_completions_for_date_range from "../domains/habits/queries/completions_for_date_range.js";
+import type * as domains_habits_queries_list from "../domains/habits/queries/list.js";
 import type * as http from "../http.js";
 
 import type {
@@ -19,6 +23,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  "domains/habits/mutations/create": typeof domains_habits_mutations_create;
+  "domains/habits/mutations/toggle_completion": typeof domains_habits_mutations_toggle_completion;
+  "domains/habits/queries/completions_for_date_range": typeof domains_habits_queries_completions_for_date_range;
+  "domains/habits/queries/list": typeof domains_habits_queries_list;
   http: typeof http;
 }>;
 

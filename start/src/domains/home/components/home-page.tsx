@@ -1,107 +1,86 @@
-import { Field as FormField, Form, reset, useForm } from '@formisch/react'
-import { useState } from 'react'
+import { CalendarDays, Check, ChevronLeft, ChevronRight, Plus, Sparkles } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import type { Id } from '../../../../convex/_generated/dataModel'
 
 import { Button } from '@/shared/components/ui/button'
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/shared/components/ui/field'
 import { Input } from '@/shared/components/ui/input'
 import { Separator } from '@/shared/components/ui/separator'
-import { demoFormSchema } from '../schemas/demo-form'
+import { useCreateHabit, useToggleHabitCompletion } from '../../habits/mutations/use-habit-mutations'
+import { useCompletions } from '../../habits/queries/use-completions'
+import { useHabits } from '../../habits/queries/use-habits'
+
+function dateKey(date: Date) { return date.toISOString().slice(0, 10) }
+function todayKey() { return dateKey(new Date()) }
+function formatLongDate(date: Date) { return new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).format(date) }
+function formatInputDate(date: Date) { return dateKey(date) }
+function shiftDate(date: Date, amount: number) { const next = new Date(date); next.setDate(next.getDate() + amount); return next }
 
 export function HomePage() {
-    const [clicks, setClicks] = useState(0)
-    const [submittedEmail, setSubmittedEmail] = useState('')
-    const form = useForm({
-        schema: demoFormSchema,
-        initialInput: { email: '' },
-    })
+    const [selectedDate, setSelectedDate] = useState(() => new Date())
+    const [newHabit, setNewHabit] = useState('')
+    const selectedKey = useMemo(() => dateKey(selectedDate), [selectedDate])
+    const habitsQuery = useHabits()
+    const completionsQuery = useCompletions(selectedKey)
+    const createHabit = useCreateHabit()
+    const toggleCompletion = useToggleHabitCompletion()
+    const habits = habitsQuery.data ?? []
+    const completions = new Set((completionsQuery.data ?? []).map((completion) => completion.habitId))
+    const completedCount = habits.filter((habit) => completions.has(habit._id)).length
+    const isToday = selectedKey === todayKey()
 
-    function resetDemo() {
-        reset(form)
-        setSubmittedEmail('')
+    function toggleHabit(habitId: Id<'habits'>) {
+        toggleCompletion.mutate({ habitId, date: selectedKey })
+    }
+
+    function changeDate(value: string) {
+        const next = new Date(`${value}T12:00:00`)
+        if (!Number.isNaN(next.getTime())) setSelectedDate(next)
+    }
+
+    function addHabit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        const name = newHabit.trim()
+        if (!name) return
+        createHabit.mutate({ name })
+        setNewHabit('')
     }
 
     return (
-        <main className="space-y-10">
-            <header className="space-y-3">
-                <p className="text-sm font-medium text-muted-foreground">eliabits / composants</p>
-                <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                    On teste les composants.
-                </h1>
-                <p className="max-w-lg text-base leading-relaxed text-muted-foreground">
-                    Quelques composants shadcn/ui, avec le thème installé et une validation de formulaire à essayer.
-                </p>
+        <main className="tracker-shell">
+            <header className="tracker-header">
+                <div className="brand-mark" aria-hidden="true"><Sparkles size={18} /></div>
+                <div><p className="eyebrow">eliabits</p><h1>Mes habitudes</h1></div>
             </header>
 
-            <section aria-labelledby="buttons-title" className="space-y-5">
-                <div className="space-y-1">
-                    <h2 id="buttons-title" className="text-lg font-semibold">Boutons</h2>
-                    <p className="text-sm text-muted-foreground">
-                        Variantes principale, secondaire, contour et désactivée.
-                    </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                    <Button onClick={() => setClicks((count) => count + 1)}>Tester le clic</Button>
-                    <Button variant="secondary" onClick={() => setClicks(0)}>Remettre à zéro</Button>
-                    <Button variant="outline" onClick={() => document.getElementById('demo-email')?.focus()}>
-                        Aller au formulaire
-                    </Button>
-                    <Button disabled>Indisponible</Button>
-                </div>
-                <p role="status" className="text-sm text-muted-foreground">
-                    {clicks} clic{clicks > 1 ? 's' : ''} enregistré{clicks > 1 ? 's' : ''}.
-                </p>
+            <section className="day-toolbar" aria-label="Sélecteur de jour">
+                <Button variant="outline" size="icon" aria-label="Jour précédent" onClick={() => setSelectedDate((date) => shiftDate(date, -1))}><ChevronLeft /></Button>
+                <label className="date-picker">
+                    <CalendarDays size={17} aria-hidden="true" />
+                    <span>{isToday ? 'Aujourd’hui' : formatLongDate(selectedDate)}</span>
+                    <Input type="date" value={formatInputDate(selectedDate)} onChange={(event) => changeDate(event.target.value)} aria-label="Choisir un jour" />
+                </label>
+                <Button variant="outline" size="icon" aria-label="Jour suivant" onClick={() => setSelectedDate((date) => shiftDate(date, 1))}><ChevronRight /></Button>
             </section>
 
-            <Separator />
-
-            <section aria-labelledby="form-title" className="space-y-5">
-                <div className="space-y-1">
-                    <h2 id="form-title" className="text-lg font-semibold">Un formulaire à essayer</h2>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                        Valide le champ vide pour voir l’erreur, puis essaie une adresse e-mail.
-                        Ce test reste dans ton navigateur.
-                    </p>
-                </div>
-                <Form
-                    of={form}
-                    onSubmit={(values) => setSubmittedEmail(values.email)}
-                    onInput={() => setSubmittedEmail('')}
-                    className="space-y-5"
-                >
-                    <FormField of={form} path={['email']}>
-                        {(field) => (
-                            <Field data-invalid={field.errors !== null}>
-                                <FieldLabel htmlFor="demo-email">Adresse e-mail</FieldLabel>
-                                <Input
-                                    {...field.props}
-                                    id="demo-email"
-                                    type="email"
-                                    autoComplete="email"
-                                    placeholder="toi@exemple.fr"
-                                    value={field.input ?? ''}
-                                    aria-invalid={field.errors !== null}
-                                    aria-describedby="demo-email-description"
-                                    aria-errormessage={field.errors ? 'demo-email-error' : undefined}
-                                />
-                                <FieldDescription id="demo-email-description">
-                                    Aucun e-mail ne sera envoyé.
-                                </FieldDescription>
-                                <FieldError
-                                    id="demo-email-error"
-                                    errors={field.errors?.map((message) => ({ message }))}
-                                />
-                            </Field>
-                        )}
-                    </FormField>
-                    <div className="flex flex-wrap gap-3">
-                        <Button type="submit" disabled={form.isSubmitting}>Valider le formulaire</Button>
-                        <Button type="button" variant="ghost" onClick={resetDemo}>Effacer</Button>
-                    </div>
-                    <p role="status" className="min-h-5 text-sm font-medium">
-                        {submittedEmail ? `Validation réussie pour ${submittedEmail}.` : ''}
-                    </p>
-                </Form>
+            <section className="day-summary" aria-label="Résumé du jour">
+                <div><p className="eyebrow">{isToday ? 'Aujourd’hui' : formatLongDate(selectedDate)}</p><p className="summary-text">Un petit geste, répété souvent.</p></div>
+                <p className="today-progress"><strong>{completedCount}</strong><span>/ {habits.length} réalisées</span></p>
             </section>
+
+            <section className="habit-list" aria-label={`Habitudes du ${formatLongDate(selectedDate)}`}>
+                <div className="habit-list-heading"><span>Habitude</span><span>Réalisée</span></div>
+                {habitsQuery.isPending && <p className="habit-state">Chargement des habitudes…</p>}
+                {habitsQuery.isError && <p className="habit-state">Impossible de charger tes habitudes. Vérifie que tu es connecté.</p>}
+                {!habitsQuery.isPending && !habitsQuery.isError && habits.length === 0 && <p className="habit-state">Aucune habitude pour le moment. Ajoute-en une ci-dessous.</p>}
+                {habits.map((habit) => {
+                    const checked = completions.has(habit._id)
+                    return <div className="habit-item" key={habit._id}><span>{habit.name}</span><Button variant={checked ? 'default' : 'outline'} size="icon" aria-label={`${habit.name} : ${checked ? 'réalisée' : 'non réalisée'}`} aria-pressed={checked} onClick={() => toggleHabit(habit._id)}>{checked && <Check />}</Button></div>
+                })}
+                <Separator />
+                <form className="add-habit" onSubmit={addHabit}><Input value={newHabit} onChange={(event) => setNewHabit(event.target.value)} placeholder="Ajouter une habitude…" aria-label="Nom de la nouvelle habitude" /><Button type="submit" variant="ghost"><Plus /> Ajouter</Button></form>
+            </section>
+
+            <p className="tracker-hint">Choisis un jour pour consulter ou modifier tes habitudes.</p>
         </main>
     )
 }

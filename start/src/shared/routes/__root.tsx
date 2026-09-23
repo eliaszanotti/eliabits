@@ -1,6 +1,7 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 
 import type { RootDocumentProps } from '../types/root-document'
+import { AppProviders } from '../lib/convex'
 
 import appCss from '../styles.css?url'
 
@@ -35,7 +36,7 @@ function RootDocument({ children }: RootDocumentProps) {
                 <HeadContent />
             </head>
             <body>
-                {children}
+                <AppProviders>{children}</AppProviders>
 
                 <Scripts />
             </body>
